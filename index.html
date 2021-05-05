@@ -1,106 +1,231 @@
-<!DOCTYPE html>
+    <!DOCTYPE html>
 
-<head>
+    <head>
 
-    <title>MBA Calculator</title>
+        <title>MBA Calculator</title>
 
-    <script src="script.jss"> </script>
-
-    <style>
+        <style>
 
 
-        .container{
-            margin: 10px 300px 10px 550px;
-            height: 400px;
-            width: 400px;
-            display: grid;
-            grid-template-columns: 60px 60px 60px 60px 60px;
-            grid-template-rows: 80px 80px 80px 80px 60px;
-        }
+            .container{
+                margin: 10px 300px 10px 550px;
+                height: 500px;
+                width: 400px;
+                display: grid;
+                grid-template-columns: 60px 60px 60px 60px 60px;
+                grid-template-rows: 80px 80px 80px 80px 60px;
+            }
 
-        p.display{
-            grid-area:1/1/1/6;
+            p.display{
+                box-sizing: border-box;
+                margin:0px;
+                grid-area:1/1/1/6;
+                border-style:solid;
+                border-width: 2px;
+                width: 300px;
+                height: 80px;
+                padding: 17px 10px 5px 5px;;
+                text-align: end;
+                font-size: 35px;
+                vertical-align: bottom;
+                    }
+
+            .clearButton{
+                grid-area: 2/4/2/6;
+            }
+
+            .operationButtons[value='multiply'] {
+                grid-area: 3/4/3/5;
+            }
+
+            .operationButtons[value='divide'] {
+                grid-area: 3/5/3/6;
+            }
+
+            .operationButtons[value='add'] {
+                grid-area: 4/4/4/5;
+            }
+
+            .operationButtons[value='subtract'] {
+                grid-area: 4/5/4/6;
+            }
+
+            .numberButtons[value='0'] {
+                background-color: lightgray;
+                grid-area: 5/1/5/3;
+            }
+
+            .decimalButton{
+                grid-area: 5/3/5/4;
+            }
+        
+            .equalToButton{
+                grid-area: 5/4/5/6;
+            }
+
+
+        </style>
+
+    </head>
+
+
+
+    <body>
+        <h1> Calculator App</h1>
+
+        <div class='container'>
+        
+            <p class="display">0</p>
+
+
+            <button class="numberButtons" type="button" value='7'>7</button>
+            <button class="numberButtons" type="button" value='8'>8</button>
+            <button class="numberButtons" type="button" value='9'>9</button>
+            <button class="numberButtons" type="button" value='4'>4</button>
+            <button class="numberButtons" type="button" value='5'>5</button>
+            <button class="numberButtons" type="button" value='6'>6</button>
+            <button class="numberButtons" type="button" value='1'>1</button>
+            <button class="numberButtons" type="button" value='2'>2</button>
+            <button class="numberButtons" type="button" value='3'>3</button>
+            <button class="numberButtons" id="zero" type="button" value=0>0</button>
+
+            <button class="operationButtons" type="button" value='add'>+</button>
+            
+            <button class="operationButtons" type="button" value='subtract'>-</button>
+            
+            <button class="operationButtons" type="button" value='multiply'>*</button>
+            
+            <button class="operationButtons" type="button" value='divide'>/</button>
+
+            <button class="equalToButton" type="button">=</button>
+
+            <button class="decimalButton" type="button"><strong>.</strong></button>
+
+            <button class="clearButton" type="button">C</button>
+
+        </div>
+
+
+        <script> 
+
+            const displayTextBox= document.querySelector('.display');
+
+            const numberBtnNodeList = document.querySelectorAll('.numberButtons');
+
+            const operationNodeList= document.querySelectorAll('.operationButtons');
+
+            const clearBtn = document.querySelector('.clearButton');
+
+            const equalBtn = document.querySelector('.equalToButton');
+
+
+            let bufferString="";
+            
+            let latestNumber="";
+
+            let previousNumber="";
+
+            let calledOperationNew='';
+            let calledOperationOld='';
+
+                    
+            operationNodeList.forEach((opButton) =>{
+                opButton.addEventListener('click', () => {
+                    operatorButtonPress(opButton);
+                }
+                )
+            })
+
+            numberBtnNodeList.forEach((numberBtn) => {
+                numberBtn.addEventListener('click',() => {
+                    numberButtonPress(numberBtn);
+                })
+            }
+            )
+
+            clearBtn.addEventListener('click',()=>{
+                clearC();
+            })
+
+             equalBtn.addEventListener('click',()=>{
+                 equalToPressed();
+            })
+            
+
+
+            function numberButtonPress(numberBtn) {
+                    latestNumber += numberBtn['value'];
+                    displayTextBox.textContent=latestNumber;
+                }
+            
+            function operatorButtonPress(opButtonItem){
+                
+                calledOperationOld=calledOperationNew;
+                calledOperationNew=opButtonItem['value'];
+
+                if(!previousNumber){
+                    updatesPrevNumber();
+                    return;
+                }  
+                    calculate();  
+            }
+
+                  
+            function clearC(){
+                latestNumber='';
+                previousNumber='';
+                displayTextBox.textContent='0';
+            }
+
+            function calculate() {
+                latestNumber = operate(+previousNumber, +latestNumber, calledOperationOld);
+                displayTextBox.textContent=latestNumber;
+                updatesPrevNumber();       
                 }
 
-        .clearButton{
-            grid-area: 2/4/2/6;
-        }
+            function updatesPrevNumber(){
+               previousNumber=latestNumber;
+               latestNumber="";
+            }
 
-        .operationButtons[value='multiply'] {
-            grid-area: 3/4/3/5;
-        }
+            function equalToPressed(){
+                latestNumber = operate(+previousNumber, +latestNumber, calledOperationNew);
+                displayTextBox.textContent=latestNumber;
+                previousNumber="";        
+                }
 
-        .operationButtons[value='divide'] {
-            grid-area: 3/5/3/6;
-        }
+    function add(x,y) {return x+y}
+    function subtract(x,y) {return x-y}
+    function multiply(x,y) {return x*y}
+    function divide(x,y) {return x/y}
 
-        .operationButtons[value='add'] {
-            grid-area: 4/4/4/5;
-        }
+    function operate(x,y,mathOperation){
+        let result='';
 
-        .operationButtons[value='subtract'] {
-            grid-area: 4/5/4/6;
-        }
+        switch(mathOperation){
+            
+            case 'add':
+                return +add(x,y);
+                break;
 
-        .numberButtons[value='0'] {
-            background-color: lightgray;
-            grid-area: 5/1/5/3;
-        }
+            case 'subtract':
+                return +subtract(x,y);
+                break;
 
-        .decimalButton{
-            grid-area: 5/3/5/4;
+            case 'multiply':
+                return +multiply(x,y);
+                break;
+
+            case 'divide':
+                return +divide(x,y);
+                break;
+
+            default:
+                alert("ERROR");
         }
-       
-        .equalToButton{
-            grid-area: 5/4/5/6;
-        }
+    }
 
         
+        </script>
 
-    </style>
-
-</head>
-
-
-
-<body>
-    <h1> Calculator App</h1>
-
-    <div class='container'>
-    
-        <p class="display">DISPLAY</p>
-
-
-        <button class="numberButtons" id="zero" type="button" value=0>0</button>
-        <button class="numberButtons" type="button" value='7'>7</button>
-        <button class="numberButtons" type="button" value='8'>8</button>
-        <button class="numberButtons" type="button" value='9'>9</button>
-        <button class="numberButtons" type="button" value='4'>4</button>
-        <button class="numberButtons" type="button" value='5'>5</button>
-        <button class="numberButtons" type="button" value='6'>6</button>
-        <button class="numberButtons" type="button" value='1'>1</button>
-        <button class="numberButtons" type="button" value='2'>2</button>
-        <button class="numberButtons" type="button" value='3'>3</button>
-
-    
-
-
-        <button class="operationButtons" type="button" value='add'>+</button>
-        
-        <button class="operationButtons" type="button" value='subtract'>-</button>
-        
-        <button class="operationButtons" type="button" value='multiply'>*</button>
-        
-        <button class="operationButtons" type="button" value='divide'>/</button>
-
-        <button class="equalToButton" type="button">=</button>
-
-        <button class="decimalButton" type="button">o</button>
-
-        <button class="clearButton" type="button">C</button>
-
-    </div>
-
-
-
-</body>
+    </body>
