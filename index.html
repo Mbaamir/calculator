@@ -119,14 +119,15 @@
             const equalBtn = document.querySelector('.equalToButton');
 
 
-            let bufferString="";
+            
             
             let latestNumber="";
-
             let previousNumber="";
 
             let calledOperationNew='';
             let calledOperationOld='';
+
+            iseqBtnResultStored=false;
 
                     
             operationNodeList.forEach((opButton) =>{
@@ -154,6 +155,11 @@
 
 
             function numberButtonPress(numberBtn) {
+                    if(iseqBtnResultStored) {
+                        iseqBtnResultStored=false;
+                        latestNumber='';
+                    }
+
                     latestNumber += numberBtn['value'];
                     displayTextBox.textContent=latestNumber;
                 }
@@ -189,9 +195,11 @@
             }
 
             function equalToPressed(){
+                if(iseqBtnResultStored) return;
                 latestNumber = operate(+previousNumber, +latestNumber, calledOperationNew);
                 displayTextBox.textContent=latestNumber;
-                previousNumber="";        
+                previousNumber="";
+                iseqBtnResultStored=true;
                 }
 
     function add(x,y) {return x+y}
