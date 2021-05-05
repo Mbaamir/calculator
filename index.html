@@ -24,11 +24,17 @@
                 border-width: 2px;
                 width: 300px;
                 height: 80px;
-                padding: 17px 10px 5px 5px;;
+                padding: 17px 10px 5px 5px;
                 text-align: end;
                 font-size: 35px;
                 vertical-align: bottom;
+                transition: all 0.1s;
                     }
+
+            .flashBox{
+                box-shadow: 0px 0px 4px 1px rgba(240,30,30,0.9);
+                border-color: orangered;
+            }
 
             .clearButton{
                 grid-area: 2/4/2/6;
@@ -151,7 +157,14 @@
              equalBtn.addEventListener('click',()=>{
                  equalToPressed();
             })
+
+            displayTextBox.addEventListener('transitionend', removeTransition);
             
+            
+            function removeTransition(e){
+                if (e.propertyName!== 'box-shadow') return;
+                displayTextBox.classList.remove('flashBox');
+                                           }
 
 
             function numberButtonPress(numberBtn) {
@@ -186,7 +199,7 @@
             function calculate() {
                 latestNumber = operate(+previousNumber, +latestNumber, calledOperationOld);
                 displayTextBox.textContent=latestNumber;
-                updatesPrevNumber();       
+                updatesPrevNumber();     
                 }
 
             function updatesPrevNumber(){
@@ -200,7 +213,12 @@
                 displayTextBox.textContent=latestNumber;
                 previousNumber="";
                 iseqBtnResultStored=true;
+                flash();
                 }
+
+            function flash(){
+                displayTextBox.classList.add('flashBox');
+            }
 
     function add(x,y) {return x+y}
     function subtract(x,y) {return x-y}
