@@ -134,6 +134,7 @@
             let calledOperationOld='';
 
             iseqBtnResultStored=false;
+            isOperatorEntered=false;
 
                     
             operationNodeList.forEach((opButton) =>{
@@ -160,35 +161,71 @@
 
             displayTextBox.addEventListener('transitionend', removeTransition);
             
-            
+
+            document.addEventListener('keydown',keyboardButtonPressed );
+               
+            document.addEventListener('keydown',(event) => console.log (event.key) );
+             
+
+            function keyboardButtonPressed(event){
+  
+                if(+event.key || (+event.key)===0) {
+                numberButtonPress(false,event.key);
+                }
+
+                if((event.key == '+') || (event.key == '-') ||
+                (event.key == '*')|| (event.key == '/')) {
+                operatorButtonPress(false,event.key);
+                }
+
+                if (event.key=='Shift'){
+                equalToPressed();
+                }
+
+                }
+                
+                
             function removeTransition(e){
                 if (e.propertyName!== 'box-shadow') return;
                 displayTextBox.classList.remove('flashBox');
                                            }
 
 
-            function numberButtonPress(numberBtn) {
-                    if(iseqBtnResultStored) {
+            function numberButtonPress(numberBtn,keyboardValue) {
+                if(isOperatorEntered){
+                    isOperatorEntered=false;
+                }    
+                
+                if (iseqBtnResultStored) {
                         iseqBtnResultStored=false;
                         latestNumber='';
                     }
+                    let theNumber='';
+                    theNumber= numberBtn? numberBtn['value']:keyboardValue;
 
-                    latestNumber += numberBtn['value'];
+                    latestNumber += theNumber;
                     displayTextBox.textContent=latestNumber;
                 }
             
-            function operatorButtonPress(opButtonItem){
-                
+            function operatorButtonPress(opButtonItem, keyBoardPress){
+                if (isOperatorEntered) return;
+                let theOperator='';
+                theOperator= opButtonItem? opButtonItem['value']:keyBoardPress;
+
                 calledOperationOld=calledOperationNew;
-                calledOperationNew=opButtonItem['value'];
+                calledOperationNew=theOperator;
 
                 if(!previousNumber){
                     updatesPrevNumber();
+                    isOperatorEntered=true; 
                     return;
                 }  
-                    calculate();  
+                    calculate();
+                    isOperatorEntered=true;  
             }
 
+
+            
                   
             function clearC(){
                 latestNumber='';
@@ -207,7 +244,7 @@
                latestNumber="";
             }
 
-            function equalToPressed(){
+            function equalToPressed() {
                 if(iseqBtnResultStored) return;
                 latestNumber = operate(+previousNumber, +latestNumber, calledOperationNew);
                 displayTextBox.textContent=latestNumber;
@@ -231,18 +268,22 @@
         switch(mathOperation){
             
             case 'add':
+            case '+':
                 return +add(x,y);
                 break;
 
             case 'subtract':
+            case '-':
                 return +subtract(x,y);
                 break;
 
             case 'multiply':
+            case '*':
                 return +multiply(x,y);
                 break;
 
             case 'divide':
+            case '/':
                 return +divide(x,y);
                 break;
 
