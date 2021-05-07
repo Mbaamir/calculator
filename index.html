@@ -168,6 +168,8 @@
              
 
             function keyboardButtonPressed(event){
+
+                console.log(event.key);
   
                 if(+event.key || (+event.key)===0) {
                 numberButtonPress(false,event.key);
@@ -182,7 +184,14 @@
                 equalToPressed();
                 }
 
-                }
+                if (event.key=='\\'){
+                    clearC();
+                                }
+
+                            }
+                
+
+                
                 
                 
             function removeTransition(e){
