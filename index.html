@@ -313,7 +313,7 @@
             }
 
             function equalToPressed() {
-                if(latestNumber==0 && previousNumber==0) return
+                if(latestNumber==='' || previousNumber=='') return;
                 if(iseqBtnResultStored) return;
 
                 latestNumber = operate(+previousNumber, +latestNumber, calledOperationNew);
