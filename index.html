@@ -6,7 +6,6 @@
 
         <style>
 
-
             .container{
                 margin: 10px 300px 10px 550px;
                 height: 500px;
@@ -37,7 +36,11 @@
             }
 
             .clearButton{
-                grid-area: 2/4/2/6;
+                grid-area: 2/5/2/6;
+            }
+
+            .backspaceButton{
+                grid-area: 2/4/2/5;
             }
 
             .operationButtons[value='multiply'] {
@@ -105,9 +108,11 @@
 
             <button class="equalToButton" type="button">=</button>
 
-            <button class="decimalButton" type="button"><strong>.</strong></button>
+            <button class="decimalButton" type="button" value='.'><strong>.</strong></button>
 
             <button class="clearButton" type="button">C</button>
+
+            <button class="backspaceButton" type="button"><-</button>
 
         </div>
 
@@ -120,24 +125,28 @@
 
             const operationNodeList= document.querySelectorAll('.operationButtons');
 
+            const decimalBtn= document.querySelector('.decimalButton');
+
             const clearBtn = document.querySelector('.clearButton');
 
             const equalBtn = document.querySelector('.equalToButton');
 
+            const backspaceBtn = document.querySelector('.backspaceButton');
 
-            
-            
+
             let latestNumber="";
             let previousNumber="";
 
             let calledOperationNew='';
             let calledOperationOld='';
 
-            iseqBtnResultStored=false;
-            isOperatorEntered=false;
+            let iseqBtnResultStored=false;
+            let isOperatorEntered=false;
+            let isDecimalEntered=false;
+            
 
                     
-            operationNodeList.forEach((opButton) =>{
+            operationNodeList.forEach( (opButton) =>{
                 opButton.addEventListener('click', () => {
                     operatorButtonPress(opButton);
                 }
@@ -148,8 +157,9 @@
                 numberBtn.addEventListener('click',() => {
                     numberButtonPress(numberBtn);
                 })
-            }
-            )
+            })
+
+            decimalBtn.addEventListener('click', decimalButtonPress);
 
             clearBtn.addEventListener('click',()=>{
                 clearC();
@@ -161,16 +171,15 @@
 
             displayTextBox.addEventListener('transitionend', removeTransition);
             
-
             document.addEventListener('keydown',keyboardButtonPressed );
                
-            document.addEventListener('keydown',(event) => console.log (event.key) );
+            backspaceBtn.addEventListener('click', backSpace);
+
+
              
 
             function keyboardButtonPressed(event){
-
-                console.log(event.key);
-  
+               
                 if(+event.key || (+event.key)===0) {
                 numberButtonPress(false,event.key);
                 }
@@ -188,19 +197,44 @@
                     clearC();
                                 }
 
-                            }
-                
+                if (event.key=='Backspace'){
+                    backSpace();
+                }
 
+                if (event.key=='.'){
+                    decimalButtonPress();
+                }
+
+               }               
                 
                 
-                
+            function reduceLatestNumberLength() {
+                    if ( isLatestNumberOver15()) {
+                    latestNumber=(String(latestNumber)).slice(0,14);
+                    console.log("splicing");
+                                }
+                            }
+
+            function isLatestNumberOver15(){
+                if(latestNumber){
+                 if (String(latestNumber).length>14){
+                    return true;
+                    }
+                }
+                return false;
+            }
+
+
             function removeTransition(e){
                 if (e.propertyName!== 'box-shadow') return;
                 displayTextBox.classList.remove('flashBox');
-                                           }
+             }
 
 
             function numberButtonPress(numberBtn,keyboardValue) {
+                  
+            if (isLatestNumberOver15()) return;
+
                 if(isOperatorEntered){
                     isOperatorEntered=false;
                 }    
@@ -216,6 +250,21 @@
                     displayTextBox.textContent=latestNumber;
                 }
             
+            function decimalButtonPress(){
+
+                if (isDecimalEntered) return;
+                if (isLatestNumberOver15()) return;
+                if (iseqBtnResultStored) {
+                        iseqBtnResultStored=false;
+                        latestNumber='';
+                }
+
+                latestNumber += '.';
+                displayTextBox.textContent=latestNumber;
+
+                isDecimalEntered = true;
+            }
+
             function operatorButtonPress(opButtonItem, keyBoardPress){
                 if (isOperatorEntered) return;
                 let theOperator='';
@@ -230,21 +279,31 @@
                     return;
                 }  
                     calculate();
-                    isOperatorEntered=true;  
+                    isOperatorEntered=true;
             }
 
 
-            
-                  
+                              
             function clearC(){
                 latestNumber='';
                 previousNumber='';
                 displayTextBox.textContent='0';
             }
 
+            function backSpace(){
+                console.log(latestNumber);
+                latestNumber=latestNumber.slice(0,-1);
+                displayTextBox.textContent=latestNumber;
+            }
+
             function calculate() {
                 latestNumber = operate(+previousNumber, +latestNumber, calledOperationOld);
+
+                console.log("ISover15:"+isLatestNumberOver15());
+                reduceLatestNumberLength();
+                               
                 displayTextBox.textContent=latestNumber;
+                
                 updatesPrevNumber();     
                 }
 
@@ -254,9 +313,14 @@
             }
 
             function equalToPressed() {
+                if(latestNumber==0 && previousNumber==0) return
                 if(iseqBtnResultStored) return;
+
                 latestNumber = operate(+previousNumber, +latestNumber, calledOperationNew);
+
+                reduceLatestNumberLength();
                 displayTextBox.textContent=latestNumber;
+
                 previousNumber="";
                 iseqBtnResultStored=true;
                 flash();
@@ -273,6 +337,7 @@
 
     function operate(x,y,mathOperation){
         let result='';
+        isDecimalEntered=false; 
 
         switch(mathOperation){
             
@@ -293,6 +358,10 @@
 
             case 'divide':
             case '/':
+                if(+y==0){
+                    alert('If you divide by 0 the universe will collapse');
+                    return +divide(x,1);
+                }
                 return +divide(x,y);
                 break;
 
@@ -300,7 +369,7 @@
                 alert("ERROR");
         }
     }
-
+            
         
         </script>
 
